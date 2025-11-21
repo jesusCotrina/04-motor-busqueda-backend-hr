@@ -5,7 +5,7 @@ e AS (
     FROM especialidad
 ),
 c AS (
-    SELECT json_agg(json_build_object('id', id, 'nombre', nombre)) AS data
+    SELECT json_agg(json_build_object('id', clinica_id, 'nombre', nombre)) AS data
     FROM clinica
 ),
 s AS (

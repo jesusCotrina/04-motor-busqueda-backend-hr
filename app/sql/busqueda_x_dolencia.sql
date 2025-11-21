@@ -24,11 +24,4 @@ JOIN clinica c ON c.clinica_id = sv.clinica_id
 JOIN sede s ON s.sede_id = sv.sede_id
 LEFT JOIN medico_especialidad me ON me.medico_id = m.medico_id
 LEFT JOIN especialidad e ON e.especialidad_id = me.especialidad_id
-WHERE
-    (CAST(:nombre_doctor AS TEXT) IS NULL OR m.nombre_completo ILIKE '%' || CAST(:nombre_doctor AS TEXT) || '%')
-    AND (CAST(:especialidad_id AS INTEGER) IS NULL OR e.especialidad_id = CAST(:especialidad_id AS INTEGER))
-    AND (CAST(:clinica_id AS INTEGER) IS NULL OR c.clinica_id = CAST(:clinica_id AS INTEGER))
-    AND (CAST(:distrito AS TEXT) IS NULL OR s.distrito ILIKE '%' || CAST(:distrito AS TEXT) || '%')
-    AND (CAST(:dia AS TEXT) IS NULL OR sv.dia = CAST(:dia AS TEXT))
-    AND (CAST(:tipo_atencion AS TEXT) IS NULL OR sv.modalidad = CAST(:tipo_atencion AS TEXT))
-ORDER BY m.calificacion ASC;
+WHERE e.nombre = ANY(:especialidades_nombre);

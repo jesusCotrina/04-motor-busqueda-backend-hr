@@ -5,8 +5,35 @@ from models.doctor import Base as DoctorBase
 from models.especialidad import Base as SpecialtyBase
 from api import search as search_router
 from sqlalchemy import text
+from fastapi.middleware.cors import CORSMiddleware
+import google.generativeai as genai
+
+genai.configure(api_key="AIzaSyDBNV8Vzh205tyxYodoTJBrvuqUSZGVr1s")
+
+model = genai.GenerativeModel(
+    model_name="gemini-2.5-pro",
+    # Aquí activamos el JSON estructurado
+    generation_config={
+        "response_mime_type": "application/json"
+    }
+)
 
 app = FastAPI(title="Motor de busqueda de clinicas y doctores inteligente")
+
+origins = [
+    "http://localhost:3000",
+    "http://172.16.80.49:3000",
+    "http://127.0.0.1:3000",
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,           # Qué dominios pueden llamar al backend
+    allow_credentials=True,
+    allow_methods=["*"],             # GET, POST, PUT, DELETE...
+    allow_headers=["*"],             # Headers permitidos
+)
 
 app.include_router(search_router.router)
 

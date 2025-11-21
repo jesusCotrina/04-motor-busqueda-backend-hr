@@ -9,21 +9,12 @@ from schemas.clinica import ClinicOut
 from schemas.doctor import DoctorOut
 from schemas.especialidad import SpecialtyOut
 from schemas.busqueda import FiltrosBusqueda
-from service.service import get_filtros_metadata,get_datos
+from schemas.user_input import UserInput
+from schemas.medicamentos_x_especialidad import EspecialidadMedicamentos
+from service.service import get_filtros_metadata,get_datos,consulta_semantica,consulta_medicamentos_
 import time 
+
 router = APIRouter(prefix="/search", tags=["search"])
-
-@router.get("/doctors", response_model=list[DoctorOut])
-async def search_doctors(name: str = Query(..., min_length=2), db: AsyncSession = Depends(get_db)):
-    query = select(Doctor).where(Doctor.name.ilike(f"%{name}%"))
-    result = await db.execute(query)
-    return result.scalars().all()
-
-@router.get("/specialties", response_model=list[SpecialtyOut])
-async def search_specialties(name: str = Query(..., min_length=2), db: AsyncSession = Depends(get_db)):
-    query = select(Specialty).where(Specialty.name.ilike(f"%{name}%"))
-    result = await db.execute(query)
-    return result.scalars().all()
 
 
 @router.get("/metadata/filtros")
@@ -54,19 +45,16 @@ async def busqueda(filters: FiltrosBusqueda, db: AsyncSession = Depends(get_db))
     print("tiempo consulta busqueda",elapsed_ms)
     return data
 
-
-@router.get("/busqueda_semantica")
-async def busqueda_semantica(db: AsyncSession = Depends(get_db)):
-    """
-    Devuelve: especialidades, clínicas, sedes, tipos_atencion.
-    Todo en una sola consulta SQL.
-    """
+@router.post("/busqueda_semantica")
+async def busqueda_semantica(user_input: UserInput,db: AsyncSession = Depends(get_db)):
     start = time.perf_counter()
-    data= await get_filtros_metadata(db)
+    data= await consulta_semantica(db,user_input)
     end = time.perf_counter()
     elapsed_ms = round((end - start) * 1000, 2)
     print("tiempo consulta busqueda_semantica",elapsed_ms)
+
     return data
+
 
 @router.get("/detalle_doctor")
 async def detalle_doctor(db: AsyncSession = Depends(get_db)):
@@ -79,4 +67,15 @@ async def detalle_doctor(db: AsyncSession = Depends(get_db)):
     end = time.perf_counter()
     elapsed_ms = round((end - start) * 1000, 2)
     print("tiempo consulta detalle_doctor",elapsed_ms)
+    return data
+
+
+@router.post("/busqueda_medicamentos")
+async def consulta_medicamentos(EspecialidadMedicamento: EspecialidadMedicamentos,db: AsyncSession = Depends(get_db)):
+    start = time.perf_counter()
+    data= await consulta_medicamentos_(db,EspecialidadMedicamento)
+    end = time.perf_counter()
+    elapsed_ms = round((end - start) * 1000, 2)
+    print("tiempo consulta busqueda_semantica",elapsed_ms)
+
     return data
