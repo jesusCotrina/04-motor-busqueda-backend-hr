@@ -20,7 +20,7 @@ s AS (
 t AS (
     SELECT json_agg(x) AS data
     FROM (
-        VALUES ('virtual'), ('presencial')
+        VALUES ('Virtual'), ('Presencial')
     ) AS v(x)
 )
 SELECT json_build_object(

@@ -5,10 +5,13 @@ import google.generativeai as genai
 import asyncio
 import json
 from concurrent.futures import ThreadPoolExecutor
+import os
 
+api_key = os.getenv("GENAI_API_KEY")  # lee la variable de entorno
+print(api_key)
 executor = ThreadPoolExecutor()
 
-genai.configure(api_key="AIzaSyDBNV8Vzh205tyxYodoTJBrvuqUSZGVr1s")
+genai.configure(api_key="api_key")
 
 model = genai.GenerativeModel(
     model_name="gemini-2.5-pro",
@@ -42,7 +45,7 @@ async def get_filtros_metadata(db: AsyncSession):
 
 
 async def get_datos(db:AsyncSession ,filters):
-    sql = await load_sql("busqueda_general.sql")
+    sql = await load_sql("busqueda.sql")
     params = {
         "nombre_doctor": filters.nombre_doctor,
         "especialidad_id": filters.especialidad_id,

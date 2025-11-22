@@ -10,7 +10,7 @@ from schemas.doctor import DoctorOut
 from schemas.especialidad import SpecialtyOut
 from schemas.busqueda import FiltrosBusqueda
 from schemas.user_input import UserInput
-from schemas.medicamentos_x_especialidad import EspecialidadMedicamentos
+from schemas.medicamentos import EspecialidadMedicamentos
 from service.service import get_filtros_metadata,get_datos,consulta_semantica,consulta_medicamentos_
 import time 
 
@@ -73,9 +73,10 @@ async def detalle_doctor(db: AsyncSession = Depends(get_db)):
 @router.post("/busqueda_medicamentos")
 async def consulta_medicamentos(EspecialidadMedicamento: EspecialidadMedicamentos,db: AsyncSession = Depends(get_db)):
     start = time.perf_counter()
+    print("busqueda_medicamentos",EspecialidadMedicamento)
     data= await consulta_medicamentos_(db,EspecialidadMedicamento)
     end = time.perf_counter()
     elapsed_ms = round((end - start) * 1000, 2)
-    print("tiempo consulta busqueda_semantica",elapsed_ms)
+    print("tiempo consulta busqueda_medicamentos",elapsed_ms)
 
     return data
