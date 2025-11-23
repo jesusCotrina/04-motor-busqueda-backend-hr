@@ -4,12 +4,12 @@ steps:
     entrypoint: "sh"
     args:
     - -c
-      - |
-        echo "==== Building Docker Image ===="
-        docker build -t ${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_REPO_NAME}/backend-motor-busqueda:latest .
+    - |
+      echo "==== Building Docker Image ===="
+      docker build -t ${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_REPO_NAME}/backend-motor-busqueda:latest .
 
-        echo "==== Pushing Docker Image ===="
-        docker push ${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_REPO_NAME}/backend-motor-busqueda:latest
+      echo "==== Pushing Docker Image ===="
+      docker push ${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_REPO_NAME}/backend-motor-busqueda:latest
 
   - id : "Deploy Image"
     name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
