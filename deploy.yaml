@@ -11,17 +11,15 @@ steps:
       echo "==== Pushing Docker Image ===="
       docker push ${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_REPO_NAME}/backend-motor-busqueda:latest
 
-  - id : "Deploy Image"
-    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: 'gcloud'
+  - id: "Activar Cloud Build B"
+    name: gcr.io/cloud-builders/git
+    entrypoint: "sh"
     args:
-      [
-        'run', 'deploy', 'motor-busqueda',
-        '--image', '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_REPO_NAME}/backend-motor-busqueda:latest',
-        '--region', '${_REGION}',
-        '--platform', 'managed',
-        '--allow-unauthenticated'
-      ]
+      - -c
+      - |
+        gcloud builds triggers run "deploy-backend-motor-busqueda" \
+          --region=us-east4 \
+          --branch="$BRANCH_NAME" 
 
 options:
   logging: CLOUD_LOGGING_ONLY
