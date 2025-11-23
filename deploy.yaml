@@ -1,6 +1,7 @@
 steps:
   - id: "Build and Push Docker Image"
     name: "gcr.io/cloud-builders/docker"
+    entrypoint: "sh"
     args:
     - -c
       - |
