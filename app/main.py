@@ -9,7 +9,6 @@ from fastapi.middleware.cors import CORSMiddleware
 import google.generativeai as genai
 
 
-
 app = FastAPI(title="Motor de busqueda de clinicas y doctores inteligente")
 
 origins = [
