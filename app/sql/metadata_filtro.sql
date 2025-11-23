@@ -10,9 +10,8 @@ c AS (
 ),
 s AS (
     SELECT json_agg(json_build_object(
-        'id', sede_id, 
-        'clinica_id', clinica_id, 
-        'nombre', nombre_sede,
+        'clinica_id', id_clinica, 
+        'nombre', sede,
         'distrito',distrito
     )) AS data
     FROM sede

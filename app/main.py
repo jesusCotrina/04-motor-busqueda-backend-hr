@@ -8,15 +8,7 @@ from sqlalchemy import text
 from fastapi.middleware.cors import CORSMiddleware
 import google.generativeai as genai
 
-genai.configure(api_key="AIzaSyDBNV8Vzh205tyxYodoTJBrvuqUSZGVr1s")
 
-model = genai.GenerativeModel(
-    model_name="gemini-2.5-pro",
-    # Aquí activamos el JSON estructurado
-    generation_config={
-        "response_mime_type": "application/json"
-    }
-)
 
 app = FastAPI(title="Motor de busqueda de clinicas y doctores inteligente")
 

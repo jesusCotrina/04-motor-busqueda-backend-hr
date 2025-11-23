@@ -20,8 +20,7 @@ router = APIRouter(prefix="/search", tags=["search"])
 @router.get("/metadata/filtros")
 async def filtros_metadata(db: AsyncSession = Depends(get_db)):
     """
-    Devuelve: especialidades, clínicas, sedes, tipos_atencion.
-    Todo en una sola consulta SQL.
+    Devuelve: la lista de especialidades, clinicas y sedes disponibles.
     """
     start = time.perf_counter()
     data= await get_filtros_metadata(db)
@@ -59,8 +58,7 @@ async def busqueda_semantica(user_input: UserInput,db: AsyncSession = Depends(ge
 @router.get("/detalle_doctor")
 async def detalle_doctor(db: AsyncSession = Depends(get_db)):
     """
-    Devuelve: especialidades, clínicas, sedes, tipos_atencion.
-    Todo en una sola consulta SQL.
+    Devuelve: el detalle del doctor
     """
     start = time.perf_counter()
     data= await get_filtros_metadata(db)
@@ -72,6 +70,9 @@ async def detalle_doctor(db: AsyncSession = Depends(get_db)):
 
 @router.post("/busqueda_medicamentos")
 async def consulta_medicamentos(EspecialidadMedicamento: EspecialidadMedicamentos,db: AsyncSession = Depends(get_db)):
+    """
+    Devuelve: el detalle del doctor
+    """
     start = time.perf_counter()
     print("busqueda_medicamentos",EspecialidadMedicamento)
     data= await consulta_medicamentos_(db,EspecialidadMedicamento)

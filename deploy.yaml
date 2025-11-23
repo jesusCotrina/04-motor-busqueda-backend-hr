@@ -1,0 +1,31 @@
+steps:
+  - id: "Build and Push Docker Image"
+    name: "gcr.io/cloud-builders/docker"
+    args:
+    - -c
+      - |
+        echo "==== Building Docker Image ===="
+        ls -la
+        image_name="img-scrp-$_CODE_IMAGE"
+        echo "image name ${image_name}"
+        docker build -t ${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_REPO_NAME}/backend-motor-busqueda:latest .
+
+        echo "==== Pushing Docker Image ===="
+        docker push ${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_REPO_NAME}/backend-motor-busqueda:latest
+
+  - id : "Deploy Image"
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      [
+        'run', 'deploy', 'fastapi-search',
+        '--image', '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_REPO_NAME}/backend-motor-busqueda:latest',
+        '--region', '${_REGION}',
+        '--platform', 'managed',
+        '--allow-unauthenticated'
+      ]
+
+substitutions:
+  _PROJECT_ID: "data-engineer-410822"
+  _REGION: "us-east4"
+  _REPO_NAME: "backend-motor-busqueda"

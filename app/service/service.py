@@ -5,17 +5,15 @@ import google.generativeai as genai
 import asyncio
 import json
 from concurrent.futures import ThreadPoolExecutor
-import os
+import os,time
 
-api_key = os.getenv("GENAI_API_KEY")  # lee la variable de entorno
-print(api_key)
+api_key = os.getenv("API_KEY_GEN")  # lee la variable de entorno
 executor = ThreadPoolExecutor()
 
-genai.configure(api_key="api_key")
+genai.configure(api_key=api_key)
 
 model = genai.GenerativeModel(
-    model_name="gemini-2.5-pro",
-    # Aquí activamos el JSON estructurado
+    model_name="gemini-2.5-flash",
     generation_config={
         "response_mime_type": "application/json"
     }
@@ -45,7 +43,7 @@ async def get_filtros_metadata(db: AsyncSession):
 
 
 async def get_datos(db:AsyncSession ,filters):
-    sql = await load_sql("busqueda.sql")
+    sql = await load_sql("busqueda_maestro.sql")
     params = {
         "nombre_doctor": filters.nombre_doctor,
         "especialidad_id": filters.especialidad_id,
@@ -65,19 +63,20 @@ async def consulta_medicamentos_(db:AsyncSession ,especialidad_ids):
 
 
 async def consulta_x_dolencia(db:AsyncSession ,especialidades):
-    sql = await load_sql("busqueda_x_dolencia.sql")
+    sql = await load_sql("busqueda_x_dolencia_maestro.sql")
     result = await db.execute(text(sql), {"especialidades_nombre": especialidades})
     return result.mappings().all()
 
 async def consulta_busqueda_semantica(db:AsyncSession, filtros):
-    sql = await load_sql("busqueda_x_dolencia.sql")
+    sql = await load_sql("busqueda_semantica_maestro.sql")
+    print("filtro consulta",filtros)
     params = {
-        "nombre_doctor": filtros.nombre_doctor,
-        "especialidad_nombre": filtros.especialidad_id,
-        "clinica_nombre": filtros.clinica_id,
-        "distrito": filtros.distrito,
-        "dia": filtros.dia,
-        "tipo_atencion": filtros.tipo_atencion
+        "nombre_doctor": filtros["nombre_doctor"],
+        "especialidad_nombre": filtros["especialidad"],
+        "clinica_nombre": filtros["clinica"],
+        "distrito": filtros["distrito"],
+        "dia": filtros["dia"],
+        "tipo_atencion": filtros["tipo_atencion"]
     }
     result = await db.execute(text(sql), params)
     return result.mappings().all()
@@ -91,25 +90,47 @@ async def consulta_semantica(db:AsyncSession ,user_input):
     prompt = await load_prompt("busqueda_semantica.txt")
     prompt=prompt.replace("{user_input}",user_input.texto)
     
+    start = time.perf_counter()
+    
+
     loop = asyncio.get_running_loop()
-    response = await loop.run_in_executor(executor, model.generate_content, prompt)
+    response = await loop.run_in_executor(
+        executor,
+        lambda: model.generate_content(
+            contents=[{"parts": [{"text": prompt}]}],
+            generation_config={"response_mime_type": "application/json"}
+        )
+    )
+    end = time.perf_counter()
+    elapsed_ms = round((end - start) * 1000, 2)
+    print("tiempo consulta llm:",elapsed_ms)
+
     json_llm=json.loads(response.text)
     print("json_llm",json_llm)
+
+    start = time.perf_counter()
     if json_llm["tipo"]=="dolencia":
         print("buscando por dolencia")
         data = await consulta_x_dolencia(db,json_llm["especialidades"])
         medicamentos_info = await consulta_medicamentos_x_dolencia(db,json_llm["especialidades"])
         json_llm["data"]=data
         json_llm["medicamentos"]=medicamentos_info
+
+        end = time.perf_counter()
+        elapsed_ms = round((end - start) * 1000, 2)
+        print("tiempo consulta base de datos semantica:",elapsed_ms)
+
         return json_llm
 
     elif json_llm["tipo"]=="busqueda":
         print("buscando por busqueda")
         data = await consulta_busqueda_semantica(db, json_llm["filtros_busqueda"])
         json_llm["data"]=data
+        end = time.perf_counter()
+        elapsed_ms = round((end - start) * 1000, 2)
+        print("tiempo consulta base de datos semantica:",elapsed_ms)
         return json_llm
 
-    elif json_llm["tipo"] is None:
+    elif json_llm["tipo"] is None or json_llm["tipo"]=="null":
         print("busqueda null")
-        data={"tipo":None}
-        return json.dumps(data)
+        return json_llm

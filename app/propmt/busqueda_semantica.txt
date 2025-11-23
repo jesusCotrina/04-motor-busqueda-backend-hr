@@ -8,7 +8,8 @@ El usuario enviará texto en lenguaje natural. Solo hay tres de clasificacion:
 Debes responder SIEMPRE en JSON ESTRICTO con esta estructura fija:
 
 {{
-"tipo": "dolencia" | "busqueda" | "null",
+"tipo": "dolencia" | "busqueda" | null,
+"sintoma_detectado": [str] | null,
 "especialidades": [str] | null,
 "filtros_busqueda": {{
     "nombre_doctor": str | null,
@@ -23,9 +24,11 @@ Debes responder SIEMPRE en JSON ESTRICTO con esta estructura fija:
 REGLAS IMPORTANTES:
 - Si tipo = "dolencia": 
     *especialidades* debe contener una lista sugerida según el síntoma, si el sintoma es muy ambiguo colocar medicina general.
+    *sintoma_detectado* colocar el sintoma detectado
     *filtros_busqueda* debe ser siempre null.
 - Si tipo = "busqueda":
     *especialidades* debe ser null.
+    *sintoma_detectado* debe ser null
     Extrae la información que se encuentre los demas campos colocar null.
 - Si el texto del usuario no tiene relacion: tipo = "null", todos los campos en null.
 
