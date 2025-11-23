@@ -25,6 +25,9 @@ steps:
         '--allow-unauthenticated'
       ]
 
+options:
+  logging: CLOUD_LOGGING_ONLY
+  
 substitutions:
   _PROJECT_ID: "data-engineer-410822"
   _REGION: "us-east4"
