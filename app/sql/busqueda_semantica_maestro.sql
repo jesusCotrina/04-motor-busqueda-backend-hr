@@ -9,5 +9,5 @@ WHERE
     AND (CAST(:dia AS TEXT) IS NULL OR dia_atencion = CAST(:dia AS TEXT))
     AND (CAST(:tipo_atencion AS TEXT) IS NULL OR tipo_atencion = CAST(:tipo_atencion AS TEXT))
 ORDER BY 
-    (horario_inicio IS NULL) ASC,
+    (hora_inicio IS NULL) ASC,
     calificacion ASC limit 20;
