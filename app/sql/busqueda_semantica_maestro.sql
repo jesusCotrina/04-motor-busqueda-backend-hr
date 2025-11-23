@@ -8,4 +8,6 @@ WHERE
     AND (CAST(:distrito AS TEXT) IS NULL OR LOWER(unaccent(distrito)) LIKE '%' || LOWER(unaccent(CAST(:distrito AS TEXT))) || '%')
     AND (CAST(:dia AS TEXT) IS NULL OR dia_atencion = CAST(:dia AS TEXT))
     AND (CAST(:tipo_atencion AS TEXT) IS NULL OR tipo_atencion = CAST(:tipo_atencion AS TEXT))
-ORDER BY calificacion ASC limit 20;
+ORDER BY 
+    (horario IS NULL) ASC,
+    calificacion ASC limit 20;
