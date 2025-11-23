@@ -4,3 +4,4 @@ SQLAlchemy==2.0.22
 asyncpg>=0.28.0
 pydantic==2.3.0
 google-genai
+google-cloud-secret-manager

@@ -6,11 +6,21 @@ import asyncio
 import json
 from concurrent.futures import ThreadPoolExecutor
 import os,time
+from google.cloud import secretmanager
 
-api_key = os.getenv("API_KEY_GEN")  # lee la variable de entorno
+
+def get_secret(secret_name: str):
+    client = secretmanager.SecretManagerServiceClient()
+    project_id = "TU_PROJECT_ID"
+    name = f"projects/138784101658/secrets/API_KEY_GEN/versions/latest"
+    response = client.access_secret_version(name=name)
+    return response.payload.data.decode("utf-8")
+
+API_KEY_GEN = get_secret("API_KEY_GEN")
+
 executor = ThreadPoolExecutor()
 
-genai.configure(api_key=api_key)
+genai.configure(api_key=API_KEY_GEN)
 
 model = genai.GenerativeModel(
     model_name="gemini-2.5-flash",
