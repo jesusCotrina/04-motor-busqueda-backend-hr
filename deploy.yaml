@@ -16,7 +16,7 @@ steps:
     entrypoint: 'gcloud'
     args:
       [
-        'run', 'deploy', 'fastapi-search',
+        'run', 'deploy', 'motor-busqueda',
         '--image', '${_REGION}-docker.pkg.dev/${_PROJECT_ID}/${_REPO_NAME}/backend-motor-busqueda:latest',
         '--region', '${_REGION}',
         '--platform', 'managed',
